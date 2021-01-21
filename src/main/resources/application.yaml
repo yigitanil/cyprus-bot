@@ -1,0 +1,7 @@
+telegram:
+  token: bot1346021515:AAGE66ZdbYj_SilFF9jHoKB8MFY_LkIDAgs
+  chatId: -407867414
+  baseUrl: https://api.telegram.org
+
+server:
+  port: 8080

@@ -3,25 +3,14 @@ package com.ygt.cyprusbot.service
 import com.binance.api.client.BinanceApiRestClient
 import com.binance.api.client.BinanceApiWebSocketClient
 import com.binance.api.client.domain.event.CandlestickEvent
-import com.binance.api.client.domain.market.Candlestick
 import com.binance.api.client.domain.market.CandlestickInterval
-import com.ygt.cyprusbot.model.PriceNumber
 import com.ygt.cyprusbot.model.Strategies
 import com.ygt.cyprusbot.service.CandleStickMapper.Companion.candleStickBarToBar
 import com.ygt.cyprusbot.service.CandleStickMapper.Companion.candleStickEventToBar
-import com.ygt.cyprusbot.strategy.AbstractCustomStrategy
-import com.ygt.cyprusbot.strategy.BollingerStrategy
-import com.ygt.cyprusbot.strategy.MacdStrategy
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.ta4j.core.BaseBar
 import org.ta4j.core.BaseBarSeries
-import reactor.util.retry.Retry
-import java.time.Duration
-import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Service

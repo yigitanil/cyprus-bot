@@ -2,8 +2,8 @@ package com.ygt.cyprusbot.service
 
 import com.binance.api.client.domain.event.CandlestickEvent
 import com.binance.api.client.domain.market.Candlestick
-import com.ygt.cyprusbot.model.PriceNumber
 import org.ta4j.core.BaseBar
+import org.ta4j.core.num.PrecisionNum
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -12,27 +12,27 @@ import java.time.ZonedDateTime
 class CandleStickMapper {
     companion object{
          fun candleStickBarToBar(it: Candlestick, intervalId: String) = BaseBar.builder()
-                .trades(it.numberOfTrades.toInt())
-                .closePrice(PriceNumber.valueOf(it.close))
-                .openPrice(PriceNumber.valueOf(it.open))
-                .highPrice(PriceNumber.valueOf(it.high))
-                .lowPrice(PriceNumber.valueOf(it.low))
-                .volume(PriceNumber.valueOf(it.volume))
-                .timePeriod(intervalToDuration(intervalId))
-                .endTime(ZonedDateTime.ofInstant(Instant.ofEpochMilli(it.closeTime), ZoneId.of("UTC")))
-                .lowPrice(PriceNumber.valueOf(it.low))
+                 .trades(it.numberOfTrades.toInt())
+                 .closePrice(PrecisionNum.valueOf(it.close))
+                 .openPrice(PrecisionNum.valueOf(it.open))
+                 .highPrice(PrecisionNum.valueOf(it.high))
+                 .lowPrice(PrecisionNum.valueOf(it.low))
+                 .volume(PrecisionNum.valueOf(it.volume))
+                 .timePeriod(intervalToDuration(intervalId))
+                 .endTime(ZonedDateTime.ofInstant(Instant.ofEpochMilli(it.closeTime), ZoneId.of("UTC")))
+                 .lowPrice(PrecisionNum.valueOf(it.low))
                 .build()
 
          fun candleStickEventToBar(it: CandlestickEvent) = BaseBar.builder()
-                .amount(PriceNumber.valueOf(it.numberOfTrades))
-                .closePrice(PriceNumber.valueOf(it.close))
-                .openPrice(PriceNumber.valueOf(it.open))
-                .highPrice(PriceNumber.valueOf(it.high))
-                .lowPrice(PriceNumber.valueOf(it.low))
-                .volume(PriceNumber.valueOf(it.volume))
-                .timePeriod(intervalToDuration(it.intervalId))
-                .endTime(ZonedDateTime.ofInstant(Instant.ofEpochMilli(it.closeTime), ZoneId.of("UTC")))
-                .lowPrice(PriceNumber.valueOf(it.low))
+                 .amount(PrecisionNum.valueOf(it.numberOfTrades))
+                 .closePrice(PrecisionNum.valueOf(it.close))
+                 .openPrice(PrecisionNum.valueOf(it.open))
+                 .highPrice(PrecisionNum.valueOf(it.high))
+                 .lowPrice(PrecisionNum.valueOf(it.low))
+                 .volume(PrecisionNum.valueOf(it.volume))
+                 .timePeriod(intervalToDuration(it.intervalId))
+                 .endTime(ZonedDateTime.ofInstant(Instant.ofEpochMilli(it.closeTime), ZoneId.of("UTC")))
+                 .lowPrice(PrecisionNum.valueOf(it.low))
                 .build()
 
        private fun intervalToDuration(intervalId: String): Duration {

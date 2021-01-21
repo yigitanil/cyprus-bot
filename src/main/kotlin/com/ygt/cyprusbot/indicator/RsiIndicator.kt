@@ -20,16 +20,16 @@ class RsiIndicator(src: BarSeries,private val length:Int) : CachedIndicator<Num>
         // compute relative strength
         val averageGain: Num = up.getValue(index)
         val averageLoss: Num = down.getValue(index)
-        val hundred = numberOf(100)
+        val hundred = numOf(100)
         if (averageLoss.isZero) {
             return if (averageGain.isZero) {
-                numberOf(0)
+                numOf(0)
             } else {
                 hundred
             }
         }
         val relativeStrength = averageGain.dividedBy(averageLoss)
         // compute relative strength index
-        return hundred.minus(hundred.dividedBy(numberOf(1).plus(relativeStrength)))
+        return hundred.minus(hundred.dividedBy(numOf(1).plus(relativeStrength)))
     }
 }

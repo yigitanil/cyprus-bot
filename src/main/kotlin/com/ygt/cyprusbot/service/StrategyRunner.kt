@@ -3,9 +3,6 @@ package com.ygt.cyprusbot.service
 import com.binance.api.client.domain.event.CandlestickEvent
 import com.ygt.cyprusbot.model.Strategies
 import com.ygt.cyprusbot.strategy.AbstractCustomStrategy
-import com.ygt.cyprusbot.strategy.BollingerStrategy
-import com.ygt.cyprusbot.strategy.MacdStrategy
-import com.ygt.cyprusbot.strategy.RsiStrategy
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClientRequestException
@@ -16,15 +13,14 @@ import reactor.util.retry.Retry
 class StrategyRunner(private val telegramClientService: TelegramClientService) {
     private val log = KotlinLogging.logger {}
 
-     fun run(notificationMap: HashMap<String, Boolean>, barSeries: BaseBarSeries, symbol: String, it: CandlestickEvent) {
-        val bollingerStrategy = BollingerStrategy(barSeries)
-        val macdStrategy = MacdStrategy(barSeries)
-        val rsiStrategy = RsiStrategy(barSeries)
-        run(Strategies.BOLLINGER, bollingerStrategy, notificationMap, barSeries, symbol)
-        run(Strategies.MACD, macdStrategy, notificationMap, barSeries, symbol)
-        run(Strategies.RSI, rsiStrategy, notificationMap, barSeries, symbol)
+    fun run(notificationMap: HashMap<String, Boolean>, barSeries: BaseBarSeries, symbol: String, it: CandlestickEvent, strategies: List<Strategies>) {
+        strategies.forEach {
+            val strategy = StrategiesFactory.get(it, barSeries)
+            run(it, strategy, notificationMap, barSeries, symbol)
+        }
+
         if (it.barFinal) {
-            for (value in Strategies.values()) {
+            for (value in strategies) {
                 if (notificationMap.containsKey(value.name)) {
                     notificationMap.put(value.name, false)
                 }
@@ -44,20 +40,20 @@ class StrategyRunner(private val telegramClientService: TelegramClientService) {
             val prefix = "${symbol.toUpperCase()}, ${barSeries.lastBar.timePeriod}"
             if (evaluate == 1) {
                 log.info { "$prefix , $strategyType possible enter point ${barSeries.lastBar}" }
-                sendMessage(prefix, strategyType.enterMessage)
+                sendMessage("$prefix, ${strategyType.enterMessage}, Last price: ${barSeries.lastBar.closePrice}")
                 notificationMap.put(strategyType.name, true)
             }
             if (evaluate == -1) {
                 log.info { "$prefix , $strategyType possible exit point ${barSeries.lastBar}" }
-                sendMessage(prefix, strategyType.exitMessage)
+                sendMessage("$prefix, ${strategyType.exitMessage}, Last price: ${barSeries.lastBar.closePrice}")
                 notificationMap.put(strategyType.name, true)
             }
         }
 
     }
 
-    private fun sendMessage(prefix: String, message: String) {
-        telegramClientService.sendMessage("${prefix} $message")
+    private fun sendMessage(message: String) {
+        telegramClientService.sendMessage(message)
                 .retryWhen(Retry.withThrowable { it.all { t -> t::class.java == WebClientRequestException::class.java } })
                 .subscribe()
     }

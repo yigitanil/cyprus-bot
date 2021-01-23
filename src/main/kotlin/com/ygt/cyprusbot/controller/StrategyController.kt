@@ -1,13 +1,11 @@
 package com.ygt.cyprusbot.controller
 
-import com.binance.api.client.domain.market.CandlestickInterval
 import com.ygt.cyprusbot.model.CandleStickExtension
 import com.ygt.cyprusbot.model.RunningStrategy
 import com.ygt.cyprusbot.model.RunningStrategyDto
 import com.ygt.cyprusbot.model.RunningStrategyPostDto
 import com.ygt.cyprusbot.service.RunningStrategyRepository
 import com.ygt.cyprusbot.service.SignalService
-import com.ygt.cyprusbot.service.StrategyRunner
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -34,7 +32,7 @@ class StrategyController(private val repository: RunningStrategyRepository,
     fun add(@RequestBody runningStrategyPostDtos:List<RunningStrategyPostDto>): Flux<RunningStrategyDto> {
         val runningStrategyDtos = runningStrategyPostDtos.map {
             val candlestickInterval = CandleStickExtension.mapByValue(it.interval)
-            val disposable = Mono.fromCallable { signalService.run(it.symbol, candlestickInterval) }
+            val disposable = Mono.fromCallable { signalService.run(it.symbol, candlestickInterval, it.strategies) }
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe()
             val runningStrategy = RunningStrategy(it.symbol, candlestickInterval, disposable, ZonedDateTime.now(ZoneId.of("UTC+3")))

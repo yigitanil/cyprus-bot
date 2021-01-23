@@ -19,21 +19,20 @@ class SignalService(private val strategyRunner: StrategyRunner,
                     private val webSocketClient: BinanceApiWebSocketClient) {
     private val log = KotlinLogging.logger {}
 
-    fun run(symbol: String, interval: CandlestickInterval) {
+    fun run(symbol: String, interval: CandlestickInterval, strategies: List<Strategies>) {
         log.info { "${symbol.toUpperCase()} with $interval interval is started" }
         val candlestickBars = restClient.getCandlestickBars(symbol.toUpperCase(), interval)
-        val bars = candlestickBars.map { candleStickBarToBar(it,interval.intervalId) }
+        val bars = candlestickBars.map { candleStickBarToBar(it, interval.intervalId) }
         val barSeries = BaseBarSeries(bars)
 
         val newBar = AtomicBoolean(false);
         val notificationMap = HashMap<String, Boolean>()
-        notificationMap.put(Strategies.BOLLINGER.name, false)
-        notificationMap.put(Strategies.MACD.name, false)
-        notificationMap.put(Strategies.RSI.name, false)
+        strategies.forEach { notificationMap.put(it.name, false) }
+
         webSocketClient.onCandlestickEvent(symbol.toLowerCase(), interval) {
             val bar = candleStickEventToBar(it)
             handleNewItem(newBar, barSeries, it, bar)
-            strategyRunner.run(notificationMap, barSeries, symbol, it)
+            strategyRunner.run(notificationMap, barSeries, symbol, it, strategies)
         }
     }
 
@@ -50,8 +49,6 @@ class SignalService(private val strategyRunner: StrategyRunner,
         }
         newBar.set(it.barFinal)
     }
-
-
 
 
 }

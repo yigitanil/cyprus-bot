@@ -8,12 +8,8 @@ import org.ta4j.core.Strategy
 import org.ta4j.core.indicators.EMAIndicator
 import org.ta4j.core.indicators.MACDIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
-import org.ta4j.core.indicators.helpers.HighPriceIndicator
-import org.ta4j.core.indicators.helpers.LowPriceIndicator
-import org.ta4j.core.indicators.helpers.PriceIndicator
+import org.ta4j.core.trading.rules.CrossedDownIndicatorRule
 import org.ta4j.core.trading.rules.CrossedUpIndicatorRule
-import org.ta4j.core.trading.rules.OverIndicatorRule
-import org.ta4j.core.trading.rules.UnderIndicatorRule
 
 class MacdStrategy(series: BarSeries) : AbstractCustomStrategy(series) {
 
@@ -21,10 +17,11 @@ class MacdStrategy(series: BarSeries) : AbstractCustomStrategy(series) {
         val close = ClosePriceIndicator(series)
         val macd = MACDIndicator(close)
         val signal = EMAIndicator(macd, 9)
-        val histogram = HistogramIndicator(macd,signal);
+        val histogram = HistogramIndicator(macd, signal);
 
-        val rule: Rule = CrossedUpIndicatorRule(macd, signal)
-        return BaseStrategy(rule, rule)
+        val enter: Rule = CrossedUpIndicatorRule(macd, signal)
+        val exit: Rule = CrossedDownIndicatorRule(macd, signal)
+        return BaseStrategy(enter, exit)
     }
 
 }

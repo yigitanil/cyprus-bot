@@ -20,7 +20,6 @@ class CandleStickMapper {
                  .volume(PrecisionNum.valueOf(it.volume))
                  .timePeriod(intervalToDuration(intervalId))
                  .endTime(ZonedDateTime.ofInstant(Instant.ofEpochMilli(it.closeTime), ZoneId.of("UTC")))
-                 .lowPrice(PrecisionNum.valueOf(it.low))
                 .build()
 
          fun candleStickEventToBar(it: CandlestickEvent) = BaseBar.builder()
@@ -32,7 +31,6 @@ class CandleStickMapper {
                  .volume(PrecisionNum.valueOf(it.volume))
                  .timePeriod(intervalToDuration(it.intervalId))
                  .endTime(ZonedDateTime.ofInstant(Instant.ofEpochMilli(it.closeTime), ZoneId.of("UTC")))
-                 .lowPrice(PrecisionNum.valueOf(it.low))
                 .build()
 
        private fun intervalToDuration(intervalId: String): Duration {

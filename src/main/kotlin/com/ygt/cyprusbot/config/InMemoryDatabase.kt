@@ -38,5 +38,4 @@ class InMemoryDatabase: RunningStrategyRepository {
         return false;
     }
 
-
 }

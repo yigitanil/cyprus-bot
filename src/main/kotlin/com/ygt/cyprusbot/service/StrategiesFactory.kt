@@ -24,6 +24,9 @@ class StrategiesFactory {
         if (strategy == Strategies.LARGE_PIN) {
             return LargePinStrategy(barSeries)
         }
+        if (strategy == Strategies.TILSON_T3) {
+            return TilsonT3ShortTermStrategy(barSeries)
+        }
 
         throw IllegalArgumentException("Cannot get strategy: ${strategy.name}")
     }

@@ -6,14 +6,14 @@ import org.ta4j.core.indicators.CachedIndicator
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.num.Num
 
-class RsiIndicator(src: BarSeries,private val length:Int) : CachedIndicator<Num>(src) {
-    private val up:Indicator<Num>
-    private val down:Indicator<Num>
+class RsiIndicator(src: BarSeries, length: Int) : CachedIndicator<Num>(src) {
+    private val up: Indicator<Num>
+    private val down: Indicator<Num>
 
     init {
         val close = ClosePriceIndicator(barSeries)
-        up=RmaIndicator(MaxIndicator(ChangeIndicator(close), 0), length)
-        down=RmaIndicator(NegativeIndicator(MinIndicator(ChangeIndicator(close), 0)), length)
+        up = RmaIndicator(MaxIndicator(ChangeIndicator(close), 0), length)
+        down = RmaIndicator(NegativeIndicator(MinIndicator(ChangeIndicator(close), 0)), length)
     }
 
     override fun calculate(index: Int): Num {

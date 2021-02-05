@@ -13,14 +13,14 @@ import reactor.util.retry.Retry
 class StrategyRunner(private val telegramClientService: TelegramClientService, private val strategiesFactory: StrategiesFactory) {
     private val log = KotlinLogging.logger {}
 
-    fun run(notificationMap: HashMap<String, Boolean>, barSeries: BaseBarSeries, symbol: String, it: CandlestickEvent, strategies: List<Strategies>) {
+    fun run(notificationMap: HashMap<String, Boolean>, barSeries: BaseBarSeries, symbol: String, candlestickEvent: CandlestickEvent, strategies: List<Strategies>) {
         strategies.forEach {
             val strategy = strategiesFactory.get(it, barSeries)
             run(it, strategy, notificationMap, barSeries, symbol)
         }
 
 
-        if (it.barFinal) {
+        if (candlestickEvent.barFinal) {
             for (value in strategies) {
                 if (notificationMap.containsKey(value.name)) {
                     notificationMap.put(value.name, false)

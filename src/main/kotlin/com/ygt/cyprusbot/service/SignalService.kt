@@ -30,9 +30,14 @@ class SignalService(private val strategyRunner: StrategyRunner,
         strategies.forEach { notificationMap.put(it.name, false) }
 
         webSocketClient.onCandlestickEvent(symbol.toLowerCase(), interval) {
-            val bar = candleStickEventToBar(it)
-            handleNewItem(newBar, barSeries, it, bar)
-            strategyRunner.run(notificationMap, barSeries, symbol, it, strategies)
+            try {
+                val bar = candleStickEventToBar(it)
+                handleNewItem(newBar, barSeries, it, bar)
+                strategyRunner.run(notificationMap, barSeries, symbol, it, strategies)
+            } catch (e: Exception) {
+                log.error(e) { "Error on candleStickEvent" }
+            }
+
         }
     }
 

@@ -26,4 +26,5 @@ class ClientConfig {
 
     @Bean
     fun binanceApiRestClient(binanceApiClientFactory: BinanceApiClientFactory): BinanceApiRestClient = binanceApiClientFactory.newRestClient()
+
 }

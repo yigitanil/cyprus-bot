@@ -46,6 +46,7 @@ internal class StrategyRunnerTest {
         val symbol = "btcusdt"
         val candlestickEvent = CandlestickEvent()
         candlestickEvent.barFinal = false
+        candlestickEvent.intervalId = "15m"
         val strategyType = Strategies.BOLLINGER
         val strategies = listOf(strategyType)
         val notificationMap = HashMap<String, Boolean>()
@@ -55,7 +56,7 @@ internal class StrategyRunnerTest {
         val message = "$prefix, ${strategyType.enterMessage}, Last price: ${barSeries.lastBar.closePrice}"
 
         //when
-        `when`(strategiesFactory.get(strategyType, barSeries)).thenReturn(strategy)
+        `when`(strategiesFactory.get(strategyType, barSeries, candlestickEvent.intervalId)).thenReturn(strategy)
         `when`(strategy.evaluate(0)).thenReturn(1)
         Mockito.`when`(telegramClientService.sendMessage(message)).thenReturn(Mono.just(""))
 
@@ -84,7 +85,8 @@ internal class StrategyRunnerTest {
         val symbol = "btcusdt"
         val candlestickEvent = CandlestickEvent()
         candlestickEvent.barFinal = true
-        val strategyType = Strategies.RSI
+        candlestickEvent.intervalId = "15m"
+        val strategyType = Strategies.STOCH
         val strategies = listOf(strategyType)
         val notificationMap = HashMap<String, Boolean>()
         notificationMap.put(strategyType.name, false)
@@ -93,7 +95,7 @@ internal class StrategyRunnerTest {
         val message = "$prefix, ${strategyType.exitMessage}, Last price: ${barSeries.lastBar.closePrice}"
 
         //when
-        `when`(strategiesFactory.get(strategyType, barSeries)).thenReturn(strategy)
+        `when`(strategiesFactory.get(strategyType, barSeries, candlestickEvent.intervalId)).thenReturn(strategy)
         `when`(strategy.evaluate(0)).thenReturn(-1)
         Mockito.`when`(telegramClientService.sendMessage(message)).thenReturn(Mono.just(""))
 
@@ -122,14 +124,15 @@ internal class StrategyRunnerTest {
         val symbol = "btcusdt"
         val candlestickEvent = CandlestickEvent()
         candlestickEvent.barFinal = true
-        val strategyType = Strategies.RSI
+        candlestickEvent.intervalId = "15m"
+        val strategyType = Strategies.STOCH
         val strategies = listOf(strategyType)
         val notificationMap = HashMap<String, Boolean>()
         notificationMap.put(strategyType.name, false)
         val strategy = mock(CustomStrategy::class.java)
 
         //when
-        `when`(strategiesFactory.get(strategyType, barSeries)).thenReturn(strategy)
+        `when`(strategiesFactory.get(strategyType, barSeries, candlestickEvent.intervalId)).thenReturn(strategy)
         `when`(strategy.evaluate(0)).thenReturn(0)
 
         //then
@@ -139,4 +142,5 @@ internal class StrategyRunnerTest {
         notificationMap.get(strategyType.name)?.let { assertFalse(it) }
 
     }
+
 }

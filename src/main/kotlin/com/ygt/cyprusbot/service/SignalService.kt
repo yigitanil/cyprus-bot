@@ -1,9 +1,9 @@
 package com.ygt.cyprusbot.service
 
 import com.binance.api.client.BinanceApiRestClient
-import com.binance.api.client.BinanceApiWebSocketClient
 import com.binance.api.client.domain.event.CandlestickEvent
 import com.binance.api.client.domain.market.CandlestickInterval
+import com.ygt.cyprusbot.config.BinanceWebSocketClient
 import com.ygt.cyprusbot.model.Strategies
 import com.ygt.cyprusbot.service.CandleStickMapper.Companion.candleStickBarToBar
 import com.ygt.cyprusbot.service.CandleStickMapper.Companion.candleStickEventToBar
@@ -15,8 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @Service
 class SignalService(private val strategyRunner: StrategyRunner,
-                    private val restClient: BinanceApiRestClient,
-                    private val webSocketClient: BinanceApiWebSocketClient) {
+                    private val restClient: BinanceApiRestClient) {
     private val log = KotlinLogging.logger {}
 
     fun run(symbol: String, interval: CandlestickInterval, strategies: List<Strategies>) {
@@ -29,7 +28,7 @@ class SignalService(private val strategyRunner: StrategyRunner,
         val notificationMap = HashMap<String, Boolean>()
         strategies.forEach { notificationMap.put(it.name, false) }
 
-        webSocketClient.onCandlestickEvent(symbol.toLowerCase(), interval) {
+        BinanceWebSocketClient.get().onCandlestickEvent(symbol.toLowerCase(), interval) {
             try {
                 val bar = candleStickEventToBar(it)
                 handleNewItem(newBar, barSeries, it, bar)

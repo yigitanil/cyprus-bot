@@ -1,5 +1,6 @@
 package com.ygt.cyprusbot.indicator
 
+import com.ygt.cyprusbot.indicator.general.*
 import org.ta4j.core.BarSeries
 import org.ta4j.core.Indicator
 import org.ta4j.core.indicators.CachedIndicator

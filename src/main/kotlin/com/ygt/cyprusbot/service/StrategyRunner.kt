@@ -15,7 +15,7 @@ class StrategyRunner(private val telegramClientService: TelegramClientService, p
 
     fun run(notificationMap: HashMap<String, Boolean>, barSeries: BaseBarSeries, symbol: String, candlestickEvent: CandlestickEvent, strategies: List<Strategies>) {
         strategies.forEach {
-            val strategy = strategiesFactory.get(it, barSeries)
+            val strategy = strategiesFactory.get(it, barSeries, candlestickEvent.intervalId)
             run(it, strategy, notificationMap, barSeries, symbol)
         }
 

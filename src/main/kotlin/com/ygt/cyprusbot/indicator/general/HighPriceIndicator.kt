@@ -1,13 +1,13 @@
-package com.ygt.cyprusbot.indicator
+package com.ygt.cyprusbot.indicator.general
 
 import org.ta4j.core.BarSeries
 import org.ta4j.core.indicators.CachedIndicator
 import org.ta4j.core.num.Num
 
-class LowPriceIndicator(src: BarSeries) : CachedIndicator<Num>(src) {
+class HighPriceIndicator(src: BarSeries) : CachedIndicator<Num>(src) {
 
     override fun calculate(index: Int): Num {
         // compute relative strength
-        return barSeries.getBar(index).lowPrice
+        return barSeries.getBar(index).highPrice
     }
 }

@@ -1,6 +1,6 @@
 package com.ygt.cyprusbot.strategy
 
-import com.ygt.cyprusbot.indicator.FunctionIndicator
+import com.ygt.cyprusbot.indicator.general.FunctionIndicator
 import org.ta4j.core.*
 import org.ta4j.core.trading.rules.OverIndicatorRule
 

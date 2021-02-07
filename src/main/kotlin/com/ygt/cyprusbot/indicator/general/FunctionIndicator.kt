@@ -1,4 +1,4 @@
-package com.ygt.cyprusbot.indicator
+package com.ygt.cyprusbot.indicator.general
 
 import org.ta4j.core.Bar
 import org.ta4j.core.BarSeries

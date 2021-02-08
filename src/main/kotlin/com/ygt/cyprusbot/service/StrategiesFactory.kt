@@ -2,6 +2,7 @@ package com.ygt.cyprusbot.service
 
 import com.binance.api.client.domain.market.CandlestickInterval
 import com.ygt.cyprusbot.model.Strategies
+import com.ygt.cyprusbot.model.mapByValue
 import com.ygt.cyprusbot.strategy.*
 import org.springframework.stereotype.Service
 import org.ta4j.core.BarSeries
@@ -10,7 +11,7 @@ import org.ta4j.core.BarSeries
 class StrategiesFactory {
 
     fun get(strategy: Strategies, barSeries: BarSeries, intervalId: String): CustomStrategy {
-        val interval = CandlestickInterval.valueOf(intervalId)
+        val interval = CandlestickInterval.HOURLY.mapByValue(intervalId)
         if (strategy == Strategies.BOLLINGER) {
             return BollingerStrategy(barSeries)
         }

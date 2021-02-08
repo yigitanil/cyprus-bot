@@ -1,9 +1,10 @@
 package com.ygt.cyprusbot.controller
 
-import com.ygt.cyprusbot.model.CandleStickExtension
+import com.binance.api.client.domain.market.CandlestickInterval
 import com.ygt.cyprusbot.model.RunningStrategy
 import com.ygt.cyprusbot.model.RunningStrategyDto
 import com.ygt.cyprusbot.model.RunningStrategyPostDto
+import com.ygt.cyprusbot.model.mapByValue
 import com.ygt.cyprusbot.service.RunningStrategyRepository
 import com.ygt.cyprusbot.service.SignalService
 import mu.KotlinLogging
@@ -34,7 +35,7 @@ class StrategyController(private val repository: RunningStrategyRepository,
     @PostMapping("/strategies")
     fun add(@RequestBody runningStrategyPostDtos: List<RunningStrategyPostDto>): Flux<RunningStrategyDto> {
         val runningStrategyDtos = runningStrategyPostDtos.map {
-            val candlestickInterval = CandleStickExtension.mapByValue(it.interval)
+            val candlestickInterval = CandlestickInterval.HOURLY.mapByValue(it.interval)
             val disposable = Mono.fromCallable { signalService.run(it.symbol, candlestickInterval, it.strategies) }
                     .doOnError { log.error { it } }
                     .subscribeOn(Schedulers.boundedElastic())

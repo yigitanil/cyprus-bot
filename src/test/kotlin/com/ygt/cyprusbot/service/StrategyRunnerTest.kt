@@ -63,7 +63,7 @@ internal class StrategyRunnerTest {
         //then
         strategyRunner.run(notificationMap, barSeries, symbol, candlestickEvent, strategies)
 
-        Mockito.verify(telegramClientService, times(1)).sendMessage(message)
+        Mockito.verify(telegramClientService, times(1)).sendMessageAsync(message)
         notificationMap.get(strategyType.name)?.let { assertTrue(it) }
 
     }
@@ -102,7 +102,7 @@ internal class StrategyRunnerTest {
         //then
         strategyRunner.run(notificationMap, barSeries, symbol, candlestickEvent, strategies)
 
-        Mockito.verify(telegramClientService, times(1)).sendMessage(message)
+        Mockito.verify(telegramClientService, times(1)).sendMessageAsync(message)
         notificationMap.get(strategyType.name)?.let { assertFalse(it) }
 
     }

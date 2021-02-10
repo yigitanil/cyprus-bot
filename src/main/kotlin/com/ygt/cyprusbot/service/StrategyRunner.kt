@@ -40,22 +40,17 @@ class StrategyRunner(private val telegramClientService: TelegramClientService, p
             val prefix = "${symbol.toUpperCase()}, ${barSeries.lastBar.timePeriod}"
             if (evaluate == 1) {
                 log.info { "$prefix , $strategyType possible enter point ${barSeries.lastBar}" }
-                sendMessage("$prefix, ${strategyType.enterMessage}, Last price: ${barSeries.lastBar.closePrice}")
+                telegramClientService.sendMessageAsync("$prefix, ${strategyType.enterMessage}, Last price: ${barSeries.lastBar.closePrice}")
                 notificationMap.put(strategyType.name, true)
             }
             if (evaluate == -1) {
                 log.info { "$prefix , $strategyType possible exit point ${barSeries.lastBar}" }
-                sendMessage("$prefix, ${strategyType.exitMessage}, Last price: ${barSeries.lastBar.closePrice}")
+                telegramClientService.sendMessageAsync("$prefix, ${strategyType.exitMessage}, Last price: ${barSeries.lastBar.closePrice}")
                 notificationMap.put(strategyType.name, true)
             }
         }
 
     }
 
-    private fun sendMessage(message: String) {
-//        telegramClientService.sendMessage(message)
-//                .retryWhen(Retry.withThrowable { it.all { t -> t::class.java == WebClientRequestException::class.java } })
-//                .subscribe()
-    }
 
 }

@@ -43,7 +43,6 @@ class StrategiesFactory {
         if (strategy == Strategies.COMBO_1H) {
             if (interval == CandlestickInterval.HOURLY) {
                 return Combo1HStrategy(barSeries)
-
             }
         }
 

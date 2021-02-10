@@ -15,16 +15,23 @@ import org.springframework.web.reactive.function.client.WebClient
 class ClientConfig {
     @Bean
     @Qualifier("telegramWebClient")
-    fun telegramWebClient(@Value("\${telegram.baseUrl}") baseUrl: String?): WebClient= WebClient
-                .builder()
-                .baseUrl(baseUrl!!)
-                .build()
+    fun telegramWebClient(@Value("\${telegram.baseUrl}") baseUrl: String?): WebClient = WebClient
+            .builder()
+            .baseUrl(baseUrl!!)
+            .build()
+
+    @Bean
+    @Qualifier("binanceWebClient")
+    fun binanceWebClient(@Value("\${binance.url}") baseUrl: String?): WebClient = WebClient
+            .builder()
+            .baseUrl(baseUrl!!)
+            .build()
 
     @Bean
     fun binanceApiClientFactory(): BinanceApiClientFactory = BinanceApiClientFactory.newInstance();
 
     @Bean
-    fun binanceApiWebSocketClient(binanceApiClientFactory: BinanceApiClientFactory): BinanceApiWebSocketClient =binanceApiClientFactory.newWebSocketClient()
+    fun binanceApiWebSocketClient(binanceApiClientFactory: BinanceApiClientFactory): BinanceApiWebSocketClient = binanceApiClientFactory.newWebSocketClient()
 
     @Bean
     fun binanceApiRestClient(binanceApiClientFactory: BinanceApiClientFactory): BinanceApiRestClient = binanceApiClientFactory.newRestClient()

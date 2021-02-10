@@ -9,10 +9,8 @@ import com.ygt.cyprusbot.strategy.Combo1HStrategy
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.ta4j.core.BaseBarSeries
 import reactor.core.publisher.Flux
-import reactor.util.retry.Retry
 
 
 @Service
@@ -32,7 +30,7 @@ class Combo1HScheduler(private val restClient: BinanceApiRestClient, private val
                             .map { CandleStickMapper.candleStickBarToBar(it, CandlestickInterval.HOURLY.intervalId) }
                     val barSeries = BaseBarSeries(bars)
                     PairBar(it, barSeries)
-                }
+                }.doOnComplete { log.info { "Combo1HScheduler is finished" } }
                 .subscribe {
                     val ndx = it.barSeries.getBarCount() - 1
                     val strategy = Combo1HStrategy(it.barSeries)
@@ -40,21 +38,14 @@ class Combo1HScheduler(private val restClient: BinanceApiRestClient, private val
                     val prefix = "${it.pair.toUpperCase()}, ${it.barSeries.lastBar.timePeriod}"
                     if (evaluate == 1) {
                         log.info { "$prefix , $strategyType possible enter point ${it.barSeries.lastBar}" }
-                        sendMessage("$prefix, ${strategyType.enterMessage}, Last price: ${it.barSeries.lastBar.closePrice}")
+                        telegramClientService.sendMessageAsync("$prefix, ${strategyType.enterMessage}, Last price: ${it.barSeries.lastBar.closePrice}")
                     }
                     if (evaluate == -1) {
                         log.info { "$prefix , $strategyType possible exit point ${it.barSeries.lastBar}" }
-                        sendMessage("$prefix, ${strategyType.exitMessage}, Last price: ${it.barSeries.lastBar.closePrice}")
+                        telegramClientService.sendMessageAsync("$prefix, ${strategyType.exitMessage}, Last price: ${it.barSeries.lastBar.closePrice}")
                     }
                 }
-        log.info { "Combo1HScheduler is finished" }
 
-    }
-
-    private fun sendMessage(message: String) {
-        telegramClientService.sendMessage(message)
-                .retryWhen(Retry.withThrowable { it.all { t -> t::class.java == WebClientRequestException::class.java } })
-                .subscribe()
     }
 
 }

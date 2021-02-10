@@ -5,15 +5,14 @@ import com.ygt.cyprusbot.model.Strategies
 import com.ygt.cyprusbot.strategy.CustomStrategy
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.ta4j.core.BaseBarSeries
-import reactor.util.retry.Retry
 
 @Service
 class StrategyRunner(private val telegramClientService: TelegramClientService, private val strategiesFactory: StrategiesFactory) {
     private val log = KotlinLogging.logger {}
 
     fun run(notificationMap: HashMap<String, Boolean>, barSeries: BaseBarSeries, symbol: String, candlestickEvent: CandlestickEvent, strategies: List<Strategies>) {
+        log.info { candlestickEvent }
         strategies.forEach {
             val strategy = strategiesFactory.get(it, barSeries, candlestickEvent.intervalId)
             run(it, strategy, notificationMap, barSeries, symbol)
@@ -54,9 +53,9 @@ class StrategyRunner(private val telegramClientService: TelegramClientService, p
     }
 
     private fun sendMessage(message: String) {
-        telegramClientService.sendMessage(message)
-                .retryWhen(Retry.withThrowable { it.all { t -> t::class.java == WebClientRequestException::class.java } })
-                .subscribe()
+//        telegramClientService.sendMessage(message)
+//                .retryWhen(Retry.withThrowable { it.all { t -> t::class.java == WebClientRequestException::class.java } })
+//                .subscribe()
     }
 
 }

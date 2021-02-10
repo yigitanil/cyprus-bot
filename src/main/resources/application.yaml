@@ -3,5 +3,8 @@ telegram:
   chatId: -407867414
   baseUrl: https://api.telegram.org
 
+binance:
+  url: https://dapi.binance.com/dapi/v1
+
 server:
   port: 8080

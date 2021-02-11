@@ -30,7 +30,7 @@ class InMemoryDatabase: RunningStrategyRepository {
 
     override fun delete(id: String) : Boolean{
         if (runningStrategyMap.containsKey(id)) {
-            runningStrategyMap.get(id)?.disposable?.dispose()
+            runningStrategyMap.get(id)?.closeable?.close()
             val runningStrategy = runningStrategyMap.remove(id)
             log.info { "${runningStrategy?.symbol?.toUpperCase()} with ${runningStrategy?.interval} is stopped" }
             return true;

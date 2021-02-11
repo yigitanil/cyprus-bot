@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.util.UriBuilder
+import reactor.util.retry.Retry
 
 @Service
 class TelegramClientService( @Value("\${telegram.token}") val token: String,
@@ -12,9 +14,9 @@ class TelegramClientService( @Value("\${telegram.token}") val token: String,
                              @Qualifier("telegramWebClient") val telegramWebClient: WebClient) {
 
     fun sendMessageAsync(message: String?) {
-//        sendMessage(message)
-//                .retryWhen(Retry.withThrowable { it.all { t -> t::class.java == WebClientRequestException::class.java } })
-//                .subscribe()
+        sendMessage(message)
+                .retryWhen(Retry.withThrowable { it.all { t -> t::class.java == WebClientRequestException::class.java } })
+                .subscribe()
     }
 
     fun sendMessage(message: String?) = telegramWebClient

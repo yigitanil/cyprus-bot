@@ -36,11 +36,11 @@ class StrategyController(private val repository: RunningStrategyRepository,
     fun add(@RequestBody runningStrategyPostDtos: List<RunningStrategyPostDto>): Flux<RunningStrategyDto> {
         val runningStrategyDtos = runningStrategyPostDtos.map {
             val candlestickInterval = CandlestickInterval.HOURLY.mapByValue(it.interval)
-            val disposable = Mono.fromCallable { signalService.run(it.symbol, candlestickInterval, it.strategies) }
+            val runningStrategy = RunningStrategy(it.symbol, candlestickInterval, null, ZonedDateTime.now(ZoneId.of("UTC+3")))
+            Mono.fromCallable { signalService.run(runningStrategy, it.strategies) }
                     .doOnError { log.error { it } }
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe()
-            val runningStrategy = RunningStrategy(it.symbol, candlestickInterval, disposable, ZonedDateTime.now(ZoneId.of("UTC+3")))
             val id = repository.add(runningStrategy)
             RunningStrategyDto(id, it.symbol, candlestickInterval, runningStrategy.createdDate)
         }

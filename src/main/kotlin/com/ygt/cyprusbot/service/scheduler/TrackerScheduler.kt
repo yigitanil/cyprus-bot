@@ -81,10 +81,6 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
             log.info { "$market ,$prefix ,Entry point  ${it.lastBar}" }
             telegramClientService.sendMessageAsync("$market $prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}")
         }
-        if (evaluate == -1) {
-            log.info { "$market ,$prefix ,Exit point  ${it.lastBar}" }
-            telegramClientService.sendMessageAsync("$market $prefix, ${strategyType.exitMessage}, Last price: ${it.lastBar.closePrice}")
-        }
 
     }
 }

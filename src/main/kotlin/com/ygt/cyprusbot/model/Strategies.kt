@@ -7,6 +7,7 @@ enum class Strategies(val enterMessage:String,val exitMessage:String) {
     MACD_DEMA("MACD_DEMA Blue line is crossing up orange line", "MACD_DEMA Blue line is crossing down orange line"),
     STOCH("*STOCH entry point*", "*STOCH exit point*"),
     TILSON_T3("Tilson T3 is turned GREEN", "Tilson T3 is turned RED"),
+    TILSONT3_MAVILIM("TilsonT3-MAVILIMW entry point", "TILSONT3_MAVILIM exit point"),
     COMBO_1H("*COMBO_1H entry point*", "*COMBO_1H exit point*")
 
 

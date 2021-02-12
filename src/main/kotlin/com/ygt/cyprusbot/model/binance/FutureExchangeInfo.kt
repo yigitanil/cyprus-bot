@@ -1,8 +1,8 @@
-package com.ygt.cyprusbot.model.binance
+package com.ygt.cyprusbot.model.binance.future
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class ExchangeInfo(
+data class FutureExchangeInfo(
 
         @field:JsonProperty("rateLimits")
         val rateLimits: List<RateLimitsItem?>? = null,

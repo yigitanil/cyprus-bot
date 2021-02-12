@@ -1,7 +1,8 @@
 package com.ygt.cyprusbot.service
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.ygt.cyprusbot.model.binance.ExchangeInfo
+import com.ygt.cyprusbot.model.binance.future.FutureExchangeInfo
+import com.ygt.cyprusbot.model.binance.spot.SpotExchangeInfo
 import org.springframework.boot.json.JacksonJsonParser
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -10,18 +11,35 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
-class BinanceClientService(private val binanceWebClient: WebClient) {
+class BinanceClientService(private val binanceFutureWebClient: WebClient, private val binanceSpotWebClient: WebClient) {
 
-    fun getExchangeInfo(): Mono<ExchangeInfo> {
-        return binanceWebClient
+    fun getSpotExchangeInfo(): Mono<SpotExchangeInfo> {
+        return getExchangeInfoResponse(binanceSpotWebClient)
+                .bodyToMono(SpotExchangeInfo::class.java)
+    }
+
+    fun getFutureExchangeInfo(): Mono<FutureExchangeInfo> {
+        return getExchangeInfoResponse(binanceFutureWebClient)
+                .bodyToMono(FutureExchangeInfo::class.java)
+    }
+
+    private fun getExchangeInfoResponse(webClient: WebClient): WebClient.ResponseSpec {
+        return webClient
                 .get()
                 .uri { it.path("/exchangeInfo").build() }
                 .retrieve()
-                .bodyToMono(ExchangeInfo::class.java)
     }
 
-    fun getCandlesticks(symbol: String, interval: String): Mono<BaseBarSeries> {
-        return binanceWebClient
+    fun getSpotCandlesticks(symbol: String, interval: String): Mono<BaseBarSeries> {
+        return getCandlesticks(symbol, interval, binanceSpotWebClient)
+    }
+
+    fun getFutureCandlesticks(symbol: String, interval: String): Mono<BaseBarSeries> {
+        return getCandlesticks(symbol, interval, binanceFutureWebClient)
+    }
+
+    private fun getCandlesticks(symbol: String, interval: String, webClient: WebClient): Mono<BaseBarSeries> {
+        return webClient
                 .get()
                 .uri {
                     it.path("/klines")

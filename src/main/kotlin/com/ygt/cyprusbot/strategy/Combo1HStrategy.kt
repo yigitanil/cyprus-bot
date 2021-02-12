@@ -5,6 +5,7 @@ import com.ygt.cyprusbot.indicator.general.PreviousIndicator
 import com.ygt.cyprusbot.indicator.inversefishertransform.InverseFisherTransformStoch
 import com.ygt.cyprusbot.indicator.tilsont3.TilsonT3
 import org.ta4j.core.*
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.PrecisionNum
 import org.ta4j.core.trading.rules.BooleanRule
@@ -33,7 +34,7 @@ class Combo1HStrategy(series: BarSeries) : AbstractCustomStrategy(series) {
                         .or(UnderIndicatorRule(stochMinus4, -0.5))
                         .or(UnderIndicatorRule(stochMinus5, -0.5))
         )
-        val mavilimWEntry = OverIndicatorRule(mavilimW, series.lastBar.closePrice)
+        val mavilimWEntry = OverIndicatorRule(ClosePriceIndicator(series), mavilimW)
 
         val enterRule: Rule = tilsonEntry.and(stochEntry).and(mavilimWEntry)
         val exitRule: Rule = BooleanRule(false)

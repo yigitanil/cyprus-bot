@@ -5,6 +5,7 @@ import com.ygt.cyprusbot.indicator.general.PreviousIndicator
 import com.ygt.cyprusbot.indicator.tilsont3.TilsonT3
 import com.ygt.cyprusbot.strategy.rule.TilsonT3EnterRule
 import org.ta4j.core.*
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator
 import org.ta4j.core.num.Num
 import org.ta4j.core.num.PrecisionNum
 import org.ta4j.core.trading.rules.BooleanRule
@@ -20,7 +21,7 @@ class TilsonT3MavilimStrategy(series: BarSeries) : AbstractCustomStrategy(series
         val mavilimW = MavilimWIndicator(series, 3, 5)
 
         val tilsonEntry = TilsonT3EnterRule(tilsonT3, tilsonT3Minus1, tilsonT3Minus2)
-        val mavilimWEntry = OverIndicatorRule(mavilimW, series.lastBar.closePrice)
+        val mavilimWEntry = OverIndicatorRule(ClosePriceIndicator(series), mavilimW)
 
         val enterRule: Rule = tilsonEntry.and(mavilimWEntry)
         val exitRule: Rule = BooleanRule(false)

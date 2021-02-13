@@ -51,7 +51,7 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
                 .parallel()
                 .flatMap { binanceClientService.getSpotCandlesticks(it.symbol, CandlestickInterval.HOURLY.intervalId) }
                 .filter {
-                    it.lastBar.closePrice.multipliedBy(it.lastBar.volume).isGreaterThanOrEqual(PrecisionNum.valueOf(10))
+                    it.lastBar.closePrice.multipliedBy(it.lastBar.volume).isGreaterThanOrEqual(PrecisionNum.valueOf(30))
                 }
                 .doOnNext {
                     runStrategy(it, Strategies.STOCH, "MARGIN")
@@ -79,7 +79,7 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
         val prefix = "${it.name.toUpperCase()}, ${it.lastBar.timePeriod}"
         if (evaluate == 1) {
             log.info { "$market ,$prefix ,Entry point  ${it.lastBar}" }
-            telegramClientService.sendMessageAsync("$market $prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}")
+            telegramClientService.sendMessageAsync("*$market* $prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}")
         }
 
     }

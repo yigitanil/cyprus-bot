@@ -4,9 +4,7 @@ import com.binance.api.client.domain.market.CandlestickInterval
 import com.ygt.cyprusbot.model.Strategies
 import com.ygt.cyprusbot.service.BinanceClientService
 import com.ygt.cyprusbot.service.TelegramClientService
-import com.ygt.cyprusbot.strategy.CustomStrategy
-import com.ygt.cyprusbot.strategy.InverseFisherTransformStochStrategy
-import com.ygt.cyprusbot.strategy.TilsonT3MavilimStrategy
+import com.ygt.cyprusbot.strategy.*
 import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -32,6 +30,8 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
                 .doOnNext {
                     runStrategy(it, Strategies.STOCH, "FUTURE")
                     runStrategy(it, Strategies.TILSONT3_MAVILIM, "FUTURE")
+                    runStrategy(it, Strategies.COMBO_1H, "FUTURE")
+                    runStrategy(it, Strategies.LARGE_PIN, "FUTURE")
                 }
                 .subscribe()
 
@@ -64,11 +64,19 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
 
     private fun runStrategy(it: BaseBarSeries, strategyType: Strategies, market: String) {
         if (strategyType == Strategies.STOCH) {
-            val strategy = InverseFisherTransformStochStrategy(it, 13, 9)
+            val strategy = InverseFisherTransformStochStrategy(it, 21, 9)
             runStrategy(it, strategyType, strategy, market)
         }
         if (strategyType == Strategies.TILSONT3_MAVILIM) {
             val strategy = TilsonT3MavilimStrategy(it)
+            runStrategy(it, strategyType, strategy, market)
+        }
+        if (strategyType == Strategies.COMBO_1H) {
+            val strategy = Combo1HStrategy(it)
+            runStrategy(it, strategyType, strategy, market)
+        }
+        if (strategyType == Strategies.LARGE_PIN) {
+            val strategy = LargePinStrategy(it)
             runStrategy(it, strategyType, strategy, market)
         }
     }
@@ -76,10 +84,10 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
     private fun runStrategy(it: BaseBarSeries, strategyType: Strategies, strategy: CustomStrategy, market: String) {
         val ndx = it.getBarCount() - 1
         val evaluate = strategy.evaluate(ndx)
-        val prefix = "${it.name.toUpperCase()}, ${it.lastBar.timePeriod}"
+        val prefix = "*$market*, ${it.name.toUpperCase()},$strategyType ${it.lastBar.timePeriod}"
         if (evaluate == 1) {
-            log.info { "$market ,$prefix ,Entry point  ${it.lastBar}" }
-            telegramClientService.sendMessageAsync("*$market* $prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}")
+            log.info { "$prefix ,Entry point  ${it.lastBar}" }
+            telegramClientService.sendMessageAsync("$prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}")
         }
 
     }

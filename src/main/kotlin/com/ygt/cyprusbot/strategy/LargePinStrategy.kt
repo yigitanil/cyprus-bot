@@ -7,8 +7,8 @@ import org.ta4j.core.trading.rules.OverIndicatorRule
 class LargePinStrategy(series: BarSeries) : AbstractCustomStrategy(series) {
 
     override fun buildStrategy(series: BarSeries): Strategy {
-        val enterIndicator = FunctionIndicator(series) { getDifference(it).abs().dividedBy(it.highPrice) }
-        val exitIndicator = FunctionIndicator(series) { getDifference(it).dividedBy(it.lowPrice) }
+        val enterIndicator = FunctionIndicator(series) { getDifference(it).abs().dividedBy(it.openPrice) }
+        val exitIndicator = FunctionIndicator(series) { getDifference(it).abs().dividedBy(it.closePrice) }
 
 
         val enter: Rule = OverIndicatorRule(enterIndicator, 0.0299999)
@@ -16,6 +16,6 @@ class LargePinStrategy(series: BarSeries) : AbstractCustomStrategy(series) {
         return BaseStrategy(enter, exit)
     }
 
-    private fun getDifference(bar: Bar) = bar.highPrice.minus(bar.lowPrice)
+    private fun getDifference(bar: Bar) = bar.openPrice.minus(bar.closePrice)
 
 }

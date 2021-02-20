@@ -29,9 +29,9 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
                 .flatMap { binanceClientService.getFutureCandlesticks(it.symbol, CandlestickInterval.HOURLY.intervalId) }
                 .doOnNext {
                     runStrategy(it, Strategies.STOCH, "FUTURE")
-                    runStrategy(it, Strategies.TILSONT3_MAVILIM, "FUTURE")
                     runStrategy(it, Strategies.COMBO_1H, "FUTURE")
                     runStrategy(it, Strategies.LARGE_PIN, "FUTURE")
+                    runStrategy(it, Strategies.MACD_DEMA, "FUTURE")
                 }
                 .subscribe()
 
@@ -79,12 +79,16 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
             val strategy = LargePinStrategy(it)
             runStrategy(it, strategyType, strategy, market)
         }
+        if (strategyType == Strategies.MACD_DEMA) {
+            val strategy = MacdStrategy(it)
+            runStrategy(it, strategyType, strategy, market)
+        }
     }
 
     private fun runStrategy(it: BaseBarSeries, strategyType: Strategies, strategy: CustomStrategy, market: String) {
         val ndx = it.getBarCount() - 1
         val evaluate = strategy.evaluate(ndx)
-        val prefix = "*$market*, ${it.name.toUpperCase()},$strategyType ${it.lastBar.timePeriod}"
+        val prefix = "*$market*, ${it.name.toUpperCase()}, $strategyType ${it.lastBar.timePeriod}"
         if (evaluate == 1) {
             log.info { "$prefix ,Entry point  ${it.lastBar}" }
             telegramClientService.sendMessageAsync("$prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}")

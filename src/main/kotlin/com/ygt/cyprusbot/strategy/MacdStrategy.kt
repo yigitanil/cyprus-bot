@@ -15,7 +15,7 @@ class MacdStrategy(series: BarSeries) : AbstractCustomStrategy(series) {
     override fun buildStrategy(series: BarSeries): Strategy {
         val close = ClosePriceIndicator(series)
         val demaSlow = DemaIndicator(close, 26)
-        val demaFast = DemaIndicator(demaSlow, 12)
+        val demaFast = DemaIndicator(close, 12)
         val ligneMACDZeroLag = BiFunctionIndicator(demaFast, demaSlow) { first, second -> first.minus(second) }
         val signal = DemaIndicator(ligneMACDZeroLag, 9)
 

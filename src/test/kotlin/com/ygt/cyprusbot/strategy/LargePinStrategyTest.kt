@@ -40,7 +40,7 @@ internal class LargePinStrategyTest {
         val bar = BaseBar.builder()
                 .lowPrice(PrecisionNum.valueOf(100))
                 .openPrice(PrecisionNum.valueOf(103))
-                .closePrice(PrecisionNum.valueOf(100))
+                .closePrice(PrecisionNum.valueOf(99))
                 .highPrice(PrecisionNum.valueOf(103))
                 .amount(PrecisionNum.valueOf(100))
                 .volume(PrecisionNum.valueOf(100))

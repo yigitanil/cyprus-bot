@@ -17,7 +17,7 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
     private val log = KotlinLogging.logger {}
 
 
-    @Scheduled(cron = "20 */15 * * * *")
+    @Scheduled(cron = "20 */30 * * * *")
     fun runFuture() {
         log.info { "Future tracker is started" }
 
@@ -30,7 +30,6 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
                 .doOnNext {
                     runStrategy(it, Strategies.STOCH, "FUTURE")
                     runStrategy(it, Strategies.COMBO_1H, "FUTURE")
-                    runStrategy(it, Strategies.LARGE_PIN, "FUTURE")
                     runStrategy(it, Strategies.MACD_DEMA, "FUTURE")
                 }
                 .subscribe()
@@ -38,14 +37,14 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
 
     }
 
-    @Scheduled(cron = "30 */15 * * * *")
+    @Scheduled(cron = "30 */30 * * * *")
     fun runSpot() {
         log.info { "Spot tracker is started" }
 
         binanceClientService
                 .getSpotExchangeInfo()
                 .flatMapMany { Flux.fromIterable(it.symbols) }
-                .filter { it.quoteAsset.equals("BTC") }
+                .filter { it.quoteAsset.equals("USDT") }
                 .filter { it.isMarginTradingAllowed }
                 .filter { it.status.equals("TRADING") }
                 .parallel()
@@ -54,8 +53,7 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
                     it.lastBar.closePrice.multipliedBy(it.lastBar.volume).isGreaterThanOrEqual(PrecisionNum.valueOf(30))
                 }
                 .doOnNext {
-                    runStrategy(it, Strategies.STOCH, "MARGIN")
-                    runStrategy(it, Strategies.TILSONT3_MAVILIM, "MARGIN")
+                    runStrategy(it, Strategies.COMBO_1H, "SPOT")
                 }
                 .subscribe()
 

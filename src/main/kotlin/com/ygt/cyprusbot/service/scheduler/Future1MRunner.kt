@@ -20,8 +20,6 @@ class Future1MRunner(private val binanceClientService: BinanceClientService,
 
     @Scheduled(cron = "4 */1 * * * *")
     fun runFuture() {
-        log.info { "Future 1M tracker is started" }
-
         binanceClientService
                 .getFutureExchangeInfo()
                 .flatMapMany { Flux.fromIterable(it.symbols) }

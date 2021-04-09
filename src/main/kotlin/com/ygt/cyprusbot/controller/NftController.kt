@@ -14,9 +14,9 @@ class NftController(private val repository: InMemoryNftDatabase) {
     private val log = KotlinLogging.logger {}
 
     @GetMapping("/nft/{id}")
-    fun delete(@PathVariable("id") id: Int): Mono<NftMetaData> {
+    fun get(@PathVariable("id") id: Int): Mono<NftMetaData> {
         val nft = repository.map.get(id)
-        return Mono.just(nft!!)
+        return Mono.justOrEmpty(nft)
     }
 
 }

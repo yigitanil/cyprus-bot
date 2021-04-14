@@ -6,18 +6,16 @@ import com.ygt.cyprusbot.service.BinanceClientService
 import com.ygt.cyprusbot.service.TelegramClientService
 import com.ygt.cyprusbot.strategy.*
 import mu.KotlinLogging
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Service
 import org.ta4j.core.BaseBarSeries
 import org.ta4j.core.num.PrecisionNum
 import reactor.core.publisher.Flux
 
-@Service
+//@Service
 class TrackerScheduler(private val binanceClientService: BinanceClientService, private val telegramClientService: TelegramClientService) {
     private val log = KotlinLogging.logger {}
 
 
-    @Scheduled(cron = "20 */30 * * * *")
+    //    @Scheduled(cron = "20 */30 * * * *")
     fun runFuture() {
         log.info { "Future tracker is started" }
 
@@ -37,7 +35,7 @@ class TrackerScheduler(private val binanceClientService: BinanceClientService, p
 
     }
 
-    @Scheduled(cron = "30 */30 * * * *")
+    //    @Scheduled(cron = "30 */30 * * * *")
     fun runSpot() {
         log.info { "Spot tracker is started" }
 

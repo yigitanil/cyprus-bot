@@ -45,6 +45,9 @@ class StrategiesFactory {
                 return Combo1HStrategy(barSeries)
             }
         }
+        if (strategy == Strategies.FIBO_BOLLINGER) {
+            return FiboBollingerStrategy(barSeries)
+        }
 
         throw IllegalArgumentException("Cannot get strategy: ${strategy.name}")
     }

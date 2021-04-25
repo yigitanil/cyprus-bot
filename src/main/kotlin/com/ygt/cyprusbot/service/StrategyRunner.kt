@@ -17,7 +17,6 @@ class StrategyRunner(private val telegramClientService: TelegramClientService, p
             run(it, strategy, notificationMap, barSeries, symbol)
         }
 
-
         if (candlestickEvent.barFinal) {
             for (value in strategies) {
                 if (notificationMap.containsKey(value.name)) {

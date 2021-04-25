@@ -8,8 +8,8 @@ import org.ta4j.core.trading.rules.AbstractRule
 class NearPriceRule(private val first: Num, private val second: Num) : AbstractRule() {
 
     override fun isSatisfied(index: Int, tradingRecord: TradingRecord?): Boolean {
-        val pointNine = second.multipliedBy(PrecisionNum.valueOf(0.9))
-        val onePointOne = second.multipliedBy(PrecisionNum.valueOf(1.1))
+        val pointNine = second.multipliedBy(PrecisionNum.valueOf(0.99))
+        val onePointOne = second.multipliedBy(PrecisionNum.valueOf(1.01))
         return first.isLessThanOrEqual(onePointOne) && first.isGreaterThanOrEqual(pointNine)
     }
 }

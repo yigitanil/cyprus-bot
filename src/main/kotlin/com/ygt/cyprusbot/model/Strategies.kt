@@ -18,7 +18,8 @@ enum class Strategies(val enterMessage:String,val exitMessage:String) {
     TILSON_T3("Tilson T3 is turned GREEN", "Tilson T3 is turned RED"),
     TILSONT3_MAVILIM("TilsonT3-MAVILIMW entry point", "TILSONT3_MAVILIM exit point"),
     COMBO_1H("*COMBO_1H entry point*", "*COMBO_1H exit point*"),
-    FIBO_BOLLINGER("*FIBO_BOLLINGER*", "*FIBO_BOLLINGER*")
+    FIBO_BOLLINGER("*FIBO_BOLLINGER*", "*FIBO_BOLLINGER*"),
+    MAVILIMW("*MAVILIMW entry point*", "*MAVILIMW exit point*")
 
 
 }

@@ -6,89 +6,86 @@ import com.ygt.cyprusbot.service.BinanceClientService
 import com.ygt.cyprusbot.service.TelegramClientService
 import com.ygt.cyprusbot.strategy.*
 import mu.KotlinLogging
+import org.apache.commons.lang3.StringUtils
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Service
 import org.ta4j.core.BaseBarSeries
-import org.ta4j.core.num.PrecisionNum
 import reactor.core.publisher.Flux
 
-//@Service
-class TrackerScheduler(private val binanceClientService: BinanceClientService, private val telegramClientService: TelegramClientService) {
+@Service
+class TrackerScheduler(
+    private val binanceClientService: BinanceClientService,
+    private val telegramClientService: TelegramClientService
+) {
     private val log = KotlinLogging.logger {}
 
 
-    //    @Scheduled(cron = "20 */30 * * * *")
+    @Scheduled(cron = "02 0 */1 * * *")
     fun runFuture() {
         log.info { "Future tracker is started" }
 
         binanceClientService
-                .getFutureExchangeInfo()
-                .flatMapMany { Flux.fromIterable(it.symbols) }
-                .filter { it.contractType.equals("PERPETUAL") }
-                .parallel()
-                .flatMap { binanceClientService.getFutureCandlesticks(it.symbol, CandlestickInterval.HOURLY.intervalId) }
-                .doOnNext {
-                    runStrategy(it, Strategies.STOCH, "FUTURE")
-                    runStrategy(it, Strategies.COMBO_1H, "FUTURE")
-                    runStrategy(it, Strategies.MACD_DEMA, "FUTURE")
-                }
-                .subscribe()
+            .getFutureExchangeInfo()
+            .flatMapMany { Flux.fromIterable(it.symbols) }
+            .filter { it.contractType.equals("PERPETUAL") }
+            .parallel()
+            .flatMap { binanceClientService.getFutureCandlesticks(it.symbol, CandlestickInterval.HOURLY.intervalId) }
+            .map { runStrategy(it, Strategies.MAVILIMW, "FUTURE") }
+            .filter(StringUtils::isNotEmpty)
+            .reduce { s1, s2 -> "- " + s1 + " \n " + s2 }
+            .doOnNext { println(it) }
+            .doOnNext { telegramClientService.sendMessageAsync(it) }
+            .subscribe()
 
 
     }
 
-    //    @Scheduled(cron = "30 */30 * * * *")
-    fun runSpot() {
-        log.info { "Spot tracker is started" }
 
-        binanceClientService
-                .getSpotExchangeInfo()
-                .flatMapMany { Flux.fromIterable(it.symbols) }
-                .filter { it.quoteAsset.equals("USDT") }
-                .filter { it.isMarginTradingAllowed }
-                .filter { it.status.equals("TRADING") }
-                .parallel()
-                .flatMap { binanceClientService.getSpotCandlesticks(it.symbol, CandlestickInterval.HOURLY.intervalId) }
-                .filter {
-                    it.lastBar.closePrice.multipliedBy(it.lastBar.volume).isGreaterThanOrEqual(PrecisionNum.valueOf(30))
-                }
-                .doOnNext {
-                    runStrategy(it, Strategies.COMBO_1H, "SPOT")
-                }
-                .subscribe()
-
-
-    }
-
-    private fun runStrategy(it: BaseBarSeries, strategyType: Strategies, market: String) {
+    private fun runStrategy(it: BaseBarSeries, strategyType: Strategies, market: String): String {
         if (strategyType == Strategies.STOCH) {
             val strategy = InverseFisherTransformStochStrategy(it, 21, 9)
-            runStrategy(it, strategyType, strategy, market)
+            return runStrategy(it, strategyType, strategy, market)
         }
         if (strategyType == Strategies.TILSONT3_MAVILIM) {
             val strategy = TilsonT3MavilimStrategy(it)
-            runStrategy(it, strategyType, strategy, market)
+            return runStrategy(it, strategyType, strategy, market)
         }
         if (strategyType == Strategies.COMBO_1H) {
             val strategy = Combo1HStrategy(it)
-            runStrategy(it, strategyType, strategy, market)
+            return runStrategy(it, strategyType, strategy, market)
         }
         if (strategyType == Strategies.LARGE_PIN) {
             val strategy = LargePinStrategy(it)
-            runStrategy(it, strategyType, strategy, market)
+            return runStrategy(it, strategyType, strategy, market)
         }
         if (strategyType == Strategies.MACD_DEMA) {
             val strategy = MacdStrategy(it)
-            runStrategy(it, strategyType, strategy, market)
+            return runStrategy(it, strategyType, strategy, market)
         }
+        if (strategyType == Strategies.MAVILIMW) {
+            val strategy = MavilimWStrategy(it)
+            return runStrategy(it, strategyType, strategy, market)
+        }
+        return "";
     }
 
-    private fun runStrategy(it: BaseBarSeries, strategyType: Strategies, strategy: CustomStrategy, market: String) {
+    private fun runStrategy(
+        it: BaseBarSeries,
+        strategyType: Strategies,
+        strategy: CustomStrategy,
+        market: String
+    ): String {
         val ndx = it.getBarCount() - 1
         val evaluate = strategy.evaluate(ndx)
-        val prefix = "*$market*, ${it.name.toUpperCase()}, $strategyType ${it.lastBar.timePeriod}"
+        val prefix = "*${it.name.toUpperCase()}, $strategyType ${it.lastBar.timePeriod}"
         if (evaluate == 1) {
             log.info { "$prefix ,Entry point  ${it.lastBar}" }
-            telegramClientService.sendMessageAsync("$prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}")
+            return "$prefix, ${strategyType.enterMessage}, Last price: ${it.lastBar.closePrice}";
         }
-
+        if (evaluate == -1) {
+            log.info { "$prefix ,Exit point  ${it.lastBar}" }
+            return "$prefix, ${strategyType.exitMessage}, Last price: ${it.lastBar.closePrice}";
+        }
+        return "";
     }
 }

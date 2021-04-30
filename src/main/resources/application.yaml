@@ -4,7 +4,7 @@ telegram:
   baseUrl: https://api.telegram.org
 
 binance:
-  futureUrl: https://dapi.binance.com/dapi/v1
+  futureUrl: https://fapi.binance.com/fapi/v1
   spotUrl: https://api.binance.com/api/v3
 
 server:

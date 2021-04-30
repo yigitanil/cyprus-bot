@@ -83,13 +83,11 @@ class TrackerScheduler(
     ): String {
         val ndx = it.getBarCount() - 2
         val evaluate = strategy.evaluate(ndx)
-        val prefix = "*$${it.name.toUpperCase().replace("_PERP", "")}*, ${it.lastBar.closePrice}"
+        val prefix = "*$${it.name.toUpperCase()}*, ${it.lastBar.closePrice}"
         if (evaluate == 1) {
-            log.info { "$prefix ,Entry point  ${it.lastBar}" }
             return "$prefix, **BUY**";
         }
         if (evaluate == -1) {
-            log.info { "$prefix ,Exit point  ${it.lastBar}" }
             return "$prefix, *SELL*";
         }
         return "";

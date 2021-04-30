@@ -81,7 +81,7 @@ class TrackerScheduler(
         it: BaseBarSeries,
         strategy: CustomStrategy
     ): String {
-        val ndx = it.getBarCount() - 1
+        val ndx = it.getBarCount() - 2
         val evaluate = strategy.evaluate(ndx)
         val prefix = "*$${it.name.toUpperCase().replace("_PERP", "")}*, ${it.lastBar.closePrice}"
         if (evaluate == 1) {
